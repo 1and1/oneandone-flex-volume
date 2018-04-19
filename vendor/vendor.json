@@ -3,6 +3,12 @@
 	"ignore": "test",
 	"package": [
 		{
+			"checksumSHA1": "nZeL7zVZHGh69iATvlFEWdzOf6g=",
+			"path": "github.com/1and1/oneandone-cloudserver-sdk-go",
+			"revision": "2dccde0c27471131299d52168b009bfa779e38b0",
+			"revisionTime": "2018-04-13T05:33:44Z"
+		},
+		{
 			"checksumSHA1": "HmbftipkadrLlCfzzVQ+iFHbl6g=",
 			"path": "github.com/golang/glog",
 			"revision": "23def4e6c14b4da8ac2ed8007337bc5eb5007998",
