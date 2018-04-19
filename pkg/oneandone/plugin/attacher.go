@@ -1,7 +1,7 @@
 package plugin
 
 import (
-	"github.com/StackPointCloud/oneandone-flex-volume/pkg/flex"
+	"github.com/1and1/oneandone-flex-volume/pkg/flex"
 )
 
 // Attach volume to the node

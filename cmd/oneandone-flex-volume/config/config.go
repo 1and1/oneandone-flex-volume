@@ -2,8 +2,12 @@ package config
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
+	"os"
 	"strings"
+
+	"github.com/golang/glog"
 )
 
 const (
@@ -16,34 +20,32 @@ const (
 // token. It will look at a file defined at en environment variable fisrt,
 // then to an environment variable
 func GetOneandoneToken() (string, error) {
-	// // try to load from file from env
-	// if f, ok := os.LookupEnv(tokenFileEnv); ok && f != "" {
-	// 	token, err := ReadTokenFromJSONFile(f)
-	// 	if err == nil && token != "" {
-	// 		return token, nil
-	// 	}
-	// 	glog.Infof("Could not find a valid configuration file at %s", f)
-	// }
+	// try to load from file from env
+	if f, ok := os.LookupEnv(tokenFileEnv); ok && f != "" {
+		token, err := ReadTokenFromJSONFile(f)
+		if err == nil && token != "" {
+			return token, nil
+		}
+		glog.Infof("Could not find a valid configuration file at %s", f)
+	}
 
-	// // try to load from environment
-	// if t, ok := os.LookupEnv(tokenEnv); ok {
-	// 	token := strings.TrimSpace(t)
-	// 	if token != "" {
-	// 		return token, nil
-	// 	}
-	// 	glog.Infof("Could not find a valid token at environment variable %s", tokenEnv)
-	// }
+	// try to load from environment
+	if t, ok := os.LookupEnv(tokenEnv); ok {
+		token := strings.TrimSpace(t)
+		if token != "" {
+			return token, nil
+		}
+		glog.Infof("Could not find a valid token at environment variable %s", tokenEnv)
+	}
 
-	// //try the default location
-	// token, err := ReadTokenFromJSONFile(tokenDefaultLocation)
-	// if err == nil && token != "" {
-	// 	return token, nil
-	// }
-	// glog.Infof("Could not find a valid configuration file at %s", tokenDefaultLocation)
+	//try the default location
+	token, err := ReadTokenFromJSONFile(tokenDefaultLocation)
+	if err == nil && token != "" {
+		return token, nil
+	}
+	glog.Infof("Could not find a valid configuration file at %s", tokenDefaultLocation)
 
-	// return "", fmt.Errorf("No valid 1and1 tokens were found: %s", err)
-
-	return "a042bbe2072faad615a53df61b62e7ba", nil
+	return "", fmt.Errorf("No valid 1and1 tokens were found: %s", err)
 }
 
 // Config contains 1&1 configuration items
