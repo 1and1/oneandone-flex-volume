@@ -24,7 +24,7 @@ install: _output/bin/$(LOCAL_OS)/oneandone-flex-volume
 
 _output/bin/%: $(GOFILES)
 	mkdir -p $(dir $@)
-	GOOS=$(word 1, $(subst /, ,$*)) go build $(GOFLAGS) -ldflags "$(LDFLAGS)" -o $@ github.com/StackPointCloud/oneandone-flex-volume/cmd/$(notdir $@)
+	GOOS=$(word 1, $(subst /, ,$*)) go build $(GOFLAGS) -ldflags "$(LDFLAGS)" -o $@ github.com/1and1/oneandone-flex-volume/cmd/$(notdir $@)
 
 _output/release/oneandone-flex-volume.tar.gz: _output/bin/linux/oneandone-flex-volume
 	mkdir -p $(dir $@)

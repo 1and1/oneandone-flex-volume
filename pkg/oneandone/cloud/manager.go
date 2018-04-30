@@ -23,6 +23,7 @@ import (
 	"fmt"
 	"os/exec"
 	"regexp"
+	"runtime"
 	"strings"
 	"time"
 
@@ -38,9 +39,19 @@ type OneandoneManager struct {
 
 // NewOneandoneManager returns a 1&1 manager
 func NewOneandoneManager(token string) (*OneandoneManager, error) {
+	_, file, no, ok := runtime.Caller(0)
+
+	if ok {
+		helper.DebugFile(fmt.Sprintf("Init called from %s#%d\n", file, no))
+	} else {
+		helper.DebugFile("not ok")
+	}
+
 	if token == "" {
 		return nil, errors.New("1and1 token is empty")
 	}
+
+	helper.DebugFile(fmt.Sprintf("Using token -> %s", token))
 
 	client := oneandone.New(token, oneandone.BaseUrl)
 

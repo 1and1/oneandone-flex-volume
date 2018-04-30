@@ -28,6 +28,7 @@ func main() {
 		glog.Errorf("Error retrieving 1&1 token: %v", err.Error())
 		os.Exit(1)
 	}
+
 	oneandone, err := cloud.NewOneandoneManager(token)
 	if err != nil {
 		glog.Errorf("Error creating 1and1 client: %v", err.Error())

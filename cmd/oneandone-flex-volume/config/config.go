@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/golang/glog"
+	"github.com/1and1/oneandone-flex-volume/helper"
 )
 
 const (
@@ -24,26 +24,30 @@ func GetOneandoneToken() (string, error) {
 	if f, ok := os.LookupEnv(tokenFileEnv); ok && f != "" {
 		token, err := ReadTokenFromJSONFile(f)
 		if err == nil && token != "" {
+			helper.DebugFile(fmt.Sprintf("Retrieved token -> %s from ONEANDONE_TOKEN_FILE_PATH -> %s", token, f))
+
 			return token, nil
 		}
-		glog.Infof("Could not find a valid configuration file at %s", f)
+		helper.DebugFile(fmt.Sprintf("Could not find a valid configuration file at %s", f))
 	}
 
 	// try to load from environment
 	if t, ok := os.LookupEnv(tokenEnv); ok {
 		token := strings.TrimSpace(t)
 		if token != "" {
+			helper.DebugFile(fmt.Sprintf("Retrieved token -> %s from ONEANDONE_TOKEN -> %s", token, tokenEnv))
 			return token, nil
 		}
-		glog.Infof("Could not find a valid token at environment variable %s", tokenEnv)
+		helper.DebugFile(fmt.Sprintf("Could not find a valid token at environment variable %s", tokenEnv))
 	}
 
 	//try the default location
 	token, err := ReadTokenFromJSONFile(tokenDefaultLocation)
 	if err == nil && token != "" {
+		helper.DebugFile(fmt.Sprintf("Retrieved token -> %s from tokenDefaultLocation -> %s", token, tokenDefaultLocation))
 		return token, nil
 	}
-	glog.Infof("Could not find a valid configuration file at %s", tokenDefaultLocation)
+	helper.DebugFile(fmt.Sprintf("Could not find a valid configuration file at %s", tokenDefaultLocation))
 
 	return "", fmt.Errorf("No valid 1and1 tokens were found: %s", err)
 }
