@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"regexp"
 	"strings"
 	"time"
 )
@@ -61,6 +62,36 @@ func GetServerID() (string, error) {
 	}
 
 	return strings.TrimRight(string(body), "\n"), nil
+}
+
+//GetDevice fetches device's name from /sys/bus/sci/devices... directory
+func GetDevice(diskID string) string {
+	base := "/sys/bus/scsi/devices"
+	files, err := ioutil.ReadDir(base)
+	if err != nil {
+		DebugFile(fmt.Sprintf("err: %s", err.Error()))
+		return ""
+	}
+
+	DebugFile(fmt.Sprintf("REGEXP %s", `\d+`+diskID+`+:0`))
+	r, _ := regexp.Compile(`\d+:` + diskID + `+:0`)
+	for _, f := range files {
+		name := f.Name()
+		DebugFile(fmt.Sprintf("looking into %s", name))
+
+		if r.MatchString(name) {
+			DebugFile(fmt.Sprintf("looking in: %s/%s/block", base, name))
+			subfiles, err := ioutil.ReadDir(fmt.Sprintf("%s/%s/block", base, name))
+			if err != nil {
+				DebugFile(fmt.Sprintf("err: %s", err.Error()))
+				return ""
+			}
+			for _, s := range subfiles {
+				return s.Name()
+			}
+		}
+	}
+	return ""
 }
 
 //Lsblk returns parsed results from `lsblk` command executed on the host

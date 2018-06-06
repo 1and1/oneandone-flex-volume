@@ -2,7 +2,6 @@ package plugin
 
 import (
 	"bufio"
-	"encoding/json"
 	"fmt"
 	"os"
 	"os/exec"
@@ -23,15 +22,6 @@ func (v *VolumePlugin) MountDevice(mountdir, device string, options string) (*fl
 		return nil, err
 	}
 
-	//get list of devices before the new block storage is attached to the server
-	lsblkOld, err := helper.Lsblk()
-	if err != nil {
-		return nil, err
-	}
-
-	jsn, _ := json.Marshal(lsblkOld)
-	helper.DebugFile(fmt.Sprintf("OLD LSBLK %s", string(jsn)))
-
 	serverID, err := helper.GetServerID()
 
 	storage, err := v.manager.GetBlockstorage(opt.StorageID)
@@ -46,29 +36,12 @@ func (v *VolumePlugin) MountDevice(mountdir, device string, options string) (*fl
 			return nil, err
 		}
 	}
-
-	//get list of devices after the new block storage has been attached
-	lsblkNew, err := helper.Lsblk()
+	storage, err = v.manager.GetBlockstorage(opt.StorageID)
 	if err != nil {
 		return nil, err
 	}
 
-	jsn, _ = json.Marshal(lsblkNew)
-	helper.DebugFile(fmt.Sprintf("NEW LSBLK %s", string(jsn)))
-
-	lsblkResult := helper.ResultDiff(*lsblkOld, *lsblkNew)
-
-	jsn, _ = json.Marshal(lsblkResult)
-	helper.DebugFile(fmt.Sprintf("DIFF LSBLK %s", string(jsn)))
-
-	if len(lsblkResult) == 0 {
-		return nil, fmt.Errorf("no new devices found")
-	}
-	if len(lsblkResult) > 1 {
-		return nil, fmt.Errorf("there is more than 1 new device")
-	}
-
-	err = v.internalMount(mountdir, fmt.Sprintf("/dev/%s", lsblkResult[0].Name), opt.FsType)
+	err = v.internalMount(mountdir, fmt.Sprintf("/dev/disk/by-id/scsi-3%s", storage.UUID), opt.FsType)
 	if err != nil {
 		return nil, err
 	}
@@ -88,7 +61,7 @@ func (v *VolumePlugin) UnmountDevice(device string) (*flex.DriverStatus, error) 
 	}
 
 	if err := v.internalUnmount(device); err != nil {
-		helper.DebugFile(fmt.Sprintf("internalMount failure  %s", err.Error()))
+		helper.DebugFile(fmt.Sprintf("internalUnmount failure  %s", err.Error()))
 		return nil, err
 	}
 
@@ -138,7 +111,7 @@ func (v *VolumePlugin) isMounted(targetDir string) (bool, error) {
 }
 
 func (v *VolumePlugin) internalMount(targetDir string, device string, fsType string) error {
-	helper.DebugFile("Started to internalMount!!!!")
+	helper.DebugFile("Mounting " + device)
 	if fsType == "" {
 		// default to ext4
 		fsType = "ext4"
@@ -200,10 +173,13 @@ func (v *VolumePlugin) internalUnmount(targetDir string) error {
 
 	umountCmd := exec.Command("umount", targetDir)
 	if umountOut, err := umountCmd.CombinedOutput(); err != nil {
-		helper.DebugFile(fmt.Sprintf("!!!!unmounting the device at %s failed with error [%s] and output [%s]", targetDir, err.Error(), string(umountOut)))
 		return fmt.Errorf("!!!!unmounting the device at %s failed with error [%s] and output [%s]", targetDir, err.Error(), string(umountOut))
 	}
 
+	//Cleanup after unmount
+	if os.RemoveAll(targetDir); err != nil {
+		return fmt.Errorf("Error while trying to remove %s, %s", targetDir, err)
+	}
 	return nil
 }
 

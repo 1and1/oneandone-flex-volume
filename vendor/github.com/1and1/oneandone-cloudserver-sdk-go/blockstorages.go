@@ -16,12 +16,14 @@ type BlockStorageRequest struct {
 type BlockStorage struct {
 	Identity
 	descField
-	Size  int    `json:"size"`
-	State string `json:"state,omitempty"`
-	// Name         string              `json:"name,omitempty"`
+	Size         int                 `json:"size"`
+	State        string              `json:"state,omitempty"`
+	Name         string              `json:"name,omitempty"`
 	CreationDate time.Time           `json:"creation_date,omitempty"`
 	Datacenter   *Datacenter         `json:"datacenter,omitempty"`
 	Server       *BlockStorageServer `json:"server,omitempty"`
+	DiskID       string              `json:"disk_id,omitemtpy"`
+	UUID         string              `json:"uuid,omitemtpy"`
 	ApiPtr
 }
 

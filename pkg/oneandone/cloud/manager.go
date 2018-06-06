@@ -119,7 +119,7 @@ func (m *OneandoneManager) AssignStorageAndWait(storageID string, serverID strin
 		return fmt.Errorf("error occured while adding storage to the server id %s, storage id %s, error %s", serverID, storageID, err.Error())
 	}
 
-	err = m.client.WaitForState(storage, "POWERED_ON", 10, 30)
+	err = m.client.WaitForState(storage, "POWERED_ON", 10, 100)
 	if err != nil {
 		return err
 	}
