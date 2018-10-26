@@ -6,11 +6,12 @@ import (
 )
 
 type BlockStorageRequest struct {
-	Name         string `json:"name"`
-	Description  string `json:"description,omitempty"`
-	Size         *int   `json:"size"`
-	ServerId     string `json:"server,omitempty"`
-	DatacenterId string `json:"datacenter_id,omitempty"`
+	Name           string `json:"name"`
+	Description    string `json:"description,omitempty"`
+	Size           *int   `json:"size"`
+	ServerId       string `json:"server,omitempty"`
+	DatacenterId   string `json:"datacenter_id,omitempty"`
+	ExecutionGroup string `json:"execution_group,omitempty"`
 }
 
 type BlockStorage struct {
